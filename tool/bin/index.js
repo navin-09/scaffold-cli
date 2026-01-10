@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import arg from "arg";
 import chalk from "chalk";
-import { pkgUpSync } from "pkg-up";
-import fs from "fs";
+import { getConfig } from "../src/config/config-mgr.js";
+import { start } from "../src/commands/start.js";
 
 try {
   const args = arg({
@@ -11,23 +11,8 @@ try {
   });
 
   if (args["--start"]) {
-    const pkgPath = pkgUpSync({ cwd: process.cwd() });
-
-    if (!pkgPath) {
-      console.log(chalk.yellow("No package.json found, using defaults"));
-      console.log(chalk.bgCyanBright("starting the app"));
-      process.exit(0);
-    }
-
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
-
-    if (pkg.tool) {
-      console.log("Found configuration", pkg.tool);
-    } else {
-      console.log(chalk.yellow("Could not find configuration, using default"));
-    }
-
-    console.log(chalk.bgCyanBright("starting the app"));
+    const config = getConfig();
+    start(config);
   }
 } catch (e) {
   console.log(chalk.yellow(e.message));
